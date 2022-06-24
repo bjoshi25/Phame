@@ -13,6 +13,23 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
+// import { useNavigate } from "react-router";
+import axios from 'axios';
+
+function Copyright(props) {
+  return (
+    <Typography variant="body2" color="text.secondary" align="center" {...props}>
+      {'Copyright © '}
+      <Link color="inherit" href="/">
+        Your Website
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
+}
+
+const theme = createTheme();
 
 // const StyledTextField = withStyles({
 //     root: {
@@ -24,30 +41,29 @@ import { withStyles } from '@mui/styles';
 //     },
 // })(TextField);
 
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
-const theme = createTheme();
-
 const SignUp = () => {
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    let email = data.get('email'),
+        password = data.get('password');
+
+    let reqBody = { email, password };
+
+    console.log('body', reqBody);
+
+    //Validation
+    if (!email || !email.includes('@') || !password) {
+        alert('Invalid sign-up credentials');
+        return;
+    }
+    //POST form data
+    let response = axios.post('/api/auth/signup', reqBody);
+    response.then((data) => {
+      console.log('response from database', data.data);
+    })
+    //Await for data for any desirable next steps
   };
 
   return (
@@ -116,12 +132,6 @@ const SignUp = () => {
                   variant="standard"
                 />
               </Grid>
-              {/* <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid> */}
             </Grid>
             <Button
               type="submit"
@@ -133,7 +143,7 @@ const SignUp = () => {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/login" variant="body2">
                   Already have an account? Sign in
                 </Link>
               </Grid>
